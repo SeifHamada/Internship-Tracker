@@ -1,3 +1,6 @@
+# Python dependencies for the Internship Tracker backend
+# Install with: pip install -r requirements.txt
+
 fastapi
 uvicorn[standard]
 sqlalchemy
