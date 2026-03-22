@@ -7,8 +7,6 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-app.include_router(router)
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,3 +14,5 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(router)
