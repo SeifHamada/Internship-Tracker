@@ -1,76 +1,132 @@
 import 'dart:convert';
+import 'dart:async'; // for TimeoutException
+import 'dart:io';    // for SocketException
 import 'package:http/http.dart' as http;
 import '../models/application.dart';
 
 class ApiService {
   final String baseUrl = 'http://10.0.2.2:8000';
 
-  // GET /applications
-  // Fetches all applications from the database
-  // Returns a list of Application objects
+  // Generic GET helper
+  Future<http.Response> _get(String url) async {
+    try {
+      return await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 5));
+    } on TimeoutException {
+      throw Exception('Request timed out. Backend might be offline.');
+    } on SocketException {
+      throw Exception('No internet or cannot reach server.');
+    }
+  }
+
+  // Generic POST helper
+  Future<http.Response> _post(String url, Map<String, dynamic> data) async {
+    try {
+      return await http
+          .post(
+            Uri.parse(url),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(data),
+          )
+          .timeout(const Duration(seconds: 5));
+    } on TimeoutException {
+      throw Exception('Request timed out. Backend might be offline.');
+    } on SocketException {
+      throw Exception('No internet or cannot reach server.');
+    }
+  }
+
+  // Generic PUT helper
+  Future<http.Response> _put(String url, Map<String, dynamic> data) async {
+    try {
+      return await http
+          .put(
+            Uri.parse(url),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(data),
+          )
+          .timeout(const Duration(seconds: 5));
+    } on TimeoutException {
+      throw Exception('Request timed out.');
+    } on SocketException {
+      throw Exception('No internet or cannot reach server.');
+    }
+  }
+
+  // Generic DELETE helper
+  Future<http.Response> _delete(String url) async {
+    try {
+      return await http
+          .delete(Uri.parse(url))
+          .timeout(const Duration(seconds: 5));
+    } on TimeoutException {
+      throw Exception('Request timed out.');
+    } on SocketException {
+      throw Exception('No internet or cannot reach server.');
+    }
+  }
+
+  // GET all
   Future<List<Application>> getApplications() async {
-    final response = await http.get(Uri.parse('$baseUrl/applications'));
+    final response = await _get('$baseUrl/applications');
+
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => Application.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to load applications');
+      throw Exception('Failed to load applications (${response.statusCode})');
     }
   }
 
-  // GET /applications/{id}
-  // Fetches a single application by its ID
-  // Returns one Application object
+  // GET one
   Future<Application> getApplication(int id) async {
-    final response = await http.get(Uri.parse('$baseUrl/applications/$id'));
+    final response = await _get('$baseUrl/applications/$id');
+
     if (response.statusCode == 200) {
       return Application.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Application not found');
+      throw Exception('Application not found (${response.statusCode})');
     }
   }
 
-  // POST /applications
-  // Creates a new application in the database
-  // Receives a map of application data, returns the created Application object
+  // POST
   Future<Application> createApplication(Map<String, dynamic> data) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/applications'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(data),
-    );
+    final response = await _post('$baseUrl/applications', data);
+
     if (response.statusCode == 201) {
       return Application.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to create application');
+      throw Exception(
+        'Failed to create application (${response.statusCode}): ${response.body}',
+      );
     }
   }
 
-  // PUT /applications/{id}
-  // Updates an existing application by its ID
-  // Only sends the fields that changed - backend handles partial updates
-  Future<Application> updateApplication(int id, Map<String, dynamic> data) async {
-    final response = await http.put(
-      Uri.parse('$baseUrl/applications/$id'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(data),
-    );
+  // PUT
+  Future<Application> updateApplication(
+      int id, Map<String, dynamic> data) async {
+    final response = await _put('$baseUrl/applications/$id', data);
+
     if (response.statusCode == 200) {
       return Application.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to update application');
+      throw Exception(
+        'Failed to update application (${response.statusCode})',
+      );
     }
   }
 
-  // DELETE /applications/{id}
-  // Deletes an application by its ID
-  // Returns true if deletion was successful
+  // DELETE
   Future<bool> deleteApplication(int id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/applications/$id'));
+    final response = await _delete('$baseUrl/applications/$id');
+
     if (response.statusCode == 200) {
       return true;
     } else {
-      throw Exception('Failed to delete application');
+      throw Exception(
+        'Failed to delete application (${response.statusCode})',
+      );
     }
   }
 }
