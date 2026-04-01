@@ -320,7 +320,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
                 icon: Icon(Icons.dashboard),
                 //open dashboard
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => DashboardScreen()),
                   );
@@ -331,7 +331,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
                 icon: Icon(Icons.person),
                 //open profile
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => ProfileScreen()),
                   );
