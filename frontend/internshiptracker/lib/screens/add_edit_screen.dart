@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import 'dashboard_screen.dart';
-import 'profile_screen.dart';
+
+import '../models/application.dart';
 
 class AddEditScreen extends StatefulWidget {
-  const AddEditScreen({super.key});
+  final Application? application;
+
+  const AddEditScreen({super.key, this.application});
 
   @override
   State<AddEditScreen> createState() => _AddEditScreenState();
@@ -28,6 +30,17 @@ class _AddEditScreenState extends State<AddEditScreen> {
     'Ghosted',
   ];
   // free controllers from memory
+  @override
+  void initState() {
+    super.initState();
+    if (widget.application != null) {
+      _companyController.text = widget.application!.company;
+      _roleController.text = widget.application!.role;
+      _applicationDate = widget.application!.applicationDate;
+      _applicationDeadline = widget.application!.deadlineDate;
+      _selectedStatus = widget.application!.status;
+    }
+  }
   @override
   void dispose() {
     _companyController.dispose();
@@ -104,23 +117,28 @@ class _AddEditScreenState extends State<AddEditScreen> {
     };
     // send to backend
     try {
-      await ApiService().createApplication(data);
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Application saved successfully')));
-      //clear field after save
-      _companyController.clear();
-      _roleController.clear();
-
-      setState(() {
-        _applicationDate = null;
-        _applicationDeadline = null;
-        _selectedStatus = null;
-        _isLoading = false;
-      });
+      if (widget.application == null) {
+        await ApiService().createApplication(data);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Application saved successfully')),
+        );
+        _companyController.clear();
+        _roleController.clear();
+        setState(() {
+          _applicationDate = null;
+          _applicationDeadline = null;
+          _selectedStatus = null;
+          _isLoading = false;
+        });
+      } else {
+        await ApiService().updateApplication(widget.application!.id, data);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Application updated successfully')),
+        );
+        Navigator.pop(context, true); // Pop to return and signal refresh
+      }
     } catch (e) {
       if (!mounted) return;
 
@@ -148,7 +166,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
         backgroundColor: Colors.grey[100],
         elevation: 0,
         title: Text(
-          "Add Internship",
+          widget.application == null ? "Add Internship" : "Edit Internship",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -304,40 +322,6 @@ class _AddEditScreenState extends State<AddEditScreen> {
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-      // bottom nav bar
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.grey[100],
-        shape: CircularNotchedRectangle(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: Icon(Icons.dashboard),
-                //open dashboard
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => DashboardScreen()),
-                  );
-                },
-              ),
-              SizedBox(width: 40),
-              IconButton(
-                icon: Icon(Icons.person),
-                //open profile
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => ProfileScreen()),
-                  );
-                },
-              ),
-            ],
           ),
         ),
       ),
