@@ -1,61 +1,52 @@
 import 'package:flutter/material.dart';
+import 'dashboard_screen.dart';
+import 'add_edit_screen.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const ProfessionalIdentityScreen(),
-    );
-  }
-}
-
-class ProfessionalIdentityScreen extends StatelessWidget {
-  const ProfessionalIdentityScreen({super.key});
+// Profile screen - displays user info and account preferences
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
+
+      // App bar with title and gradient bottom border
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: const BackButton(color: Color(0xFF1A237E)),
+        automaticallyImplyLeading: false,
         title: const Text(
-          'Professional Identity',
-          style: TextStyle(color: Color(0xFF1A237E), fontWeight: FontWeight.w600),
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: Icon(Icons.settings, color: Color(0xFF1A237E)),
+          'Profile',
+          style: TextStyle(
+            color: Color(0xFF1A237E),
+            fontWeight: FontWeight.w600,
           ),
-        ],
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(3),
           child: Container(
             height: 3,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF1A237E), Color(0xFF42A5F5), Color(0xFFC62828)],
+                colors: [
+                  Color(0xFF1A237E),
+                  Color(0xFF42A5F5),
+                  Color(0xFFC62828),
+                ],
               ),
             ),
           ),
         ),
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             const SizedBox(height: 16),
 
-            // Avatar
+            // User avatar with edit icon overlay
             Stack(
               children: [
                 Container(
@@ -64,9 +55,15 @@ class ProfessionalIdentityScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+                    boxShadow: [
+                      BoxShadow(color: Colors.black12, blurRadius: 8),
+                    ],
                   ),
-                  child: const Icon(Icons.person, size: 52, color: Color(0xFF1A237E)),
+                  child: const Icon(
+                    Icons.person,
+                    size: 52,
+                    color: Color(0xFF1A237E),
+                  ),
                 ),
                 Positioned(
                   bottom: 0,
@@ -78,20 +75,32 @@ class ProfessionalIdentityScreen extends StatelessWidget {
                       color: Color(0xFF3949AB),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.edit, size: 15, color: Colors.white),
+                    child: const Icon(
+                      Icons.edit,
+                      size: 15,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],
             ),
 
             const SizedBox(height: 12),
-            const Text('JohnDoe', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+
+            // User name and email - static display
+            const Text(
+              'JohnDoe',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 4),
-            const Text('johndoe@interntrack.edu', style: TextStyle(color: Colors.grey, fontSize: 13)),
+            const Text(
+              'johndoe@interntrack.edu',
+              style: TextStyle(color: Colors.grey, fontSize: 13),
+            ),
 
             const SizedBox(height: 20),
 
-            // Stats
+            // Stats row - active logs and tier
             Row(
               children: [
                 _statCard('ACTIVE LOGS', '24', Colors.white),
@@ -102,57 +111,92 @@ class ProfessionalIdentityScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Preferences
+            // Account preferences section label
             const Align(
               alignment: Alignment.centerLeft,
-              child: Text('ACCOUNT PREFERENCES',
-                  style: TextStyle(fontSize: 11, color: Colors.grey, letterSpacing: 1.1, fontWeight: FontWeight.w600)),
+              child: Text(
+                'ACCOUNT PREFERENCES',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey,
+                  letterSpacing: 1.1,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
             const SizedBox(height: 10),
+
+            // Preference tiles
             _prefTile(Icons.lock_outline, 'Privacy settings'),
             const SizedBox(height: 1),
             _prefTile(Icons.person_outline, 'Export portfolio'),
 
             const Spacer(),
 
-            // Logout
+            // Logout button - no functionality, static only
             SizedBox(
               width: double.infinity,
               height: 50,
               child: ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.logout, color: Colors.white),
-                label: const Text('Logout', style: TextStyle(color: Colors.white, fontSize: 15)),
+                label: const Text(
+                  'Logout',
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFC62828),
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
 
             const SizedBox(height: 10),
-            const SizedBox(height: 8),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 3,
-        selectedItemColor: const Color(0xFF1A237E),
-        unselectedItemColor: Colors.grey,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 10),
-        unselectedLabelStyle: const TextStyle(fontSize: 10),
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.grid_view_rounded), label: 'JOURNAL'),
-          BottomNavigationBarItem(icon: Icon(Icons.work_outline), label: 'APPLICATIONS'),
-          BottomNavigationBarItem(icon: Icon(Icons.explore_outlined), label: 'DISCOVER'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'PROFILE'),
-        ],
+
+      // Bottom navigation bar matching the rest of the app
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.grey[100],
+        shape: const CircularNotchedRectangle(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Navigate to dashboard
+              IconButton(
+                icon: const Icon(Icons.dashboard),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => DashboardScreen()),
+                  );
+                },
+              ),
+              const SizedBox(width: 40),
+              // Navigate to add application screen
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => AddEditScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
+  // Reusable stat card widget
   Widget _statCard(String label, String value, Color bg) {
     return Expanded(
       child: Container(
@@ -160,20 +204,38 @@ class ProfessionalIdentityScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6)],
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey, letterSpacing: 1, fontWeight: FontWeight.w600)),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                color: Colors.grey,
+                letterSpacing: 1,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: 6),
-            Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1A237E))),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1A237E),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
+  // Reusable preference tile widget
   Widget _prefTile(IconData icon, String label) {
     return Container(
       color: Colors.white,
