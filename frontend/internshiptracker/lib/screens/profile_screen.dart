@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'register_screen.dart';
 
 // Profile screen - displays user info and account preferences
 class ProfileScreen extends StatelessWidget {
@@ -136,7 +137,13 @@ class ProfileScreen extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                    (route) => false,
+                  );
+                },
                 icon: const Icon(Icons.logout, color: Colors.white),
                 label: const Text(
                   'Logout',

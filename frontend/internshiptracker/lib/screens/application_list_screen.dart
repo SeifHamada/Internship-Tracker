@@ -278,7 +278,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
                       builder: (context) => AddEditScreen(application: app),
                     ),
                   );
-                  if (result == true || mounted) {
+                  if (result == true && mounted) {
                     _loadApplications();
                   }
                 },

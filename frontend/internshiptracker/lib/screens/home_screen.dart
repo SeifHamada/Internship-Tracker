@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-
 import 'dashboard_screen.dart';
 import 'profile_screen.dart';
+import 'add_edit_screen.dart';
 
-/// Navigation shell: manages bottom nav between Home, Add (push), and Profile.
+// Navigation shell that manages switching between Dashboard and Profile
+// Also provides a FAB to navigate to the Add Application screen
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -21,9 +22,25 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Switches between Dashboard and Profile based on selected tab
       body: _currentIndex == 1
           ? const ProfileScreen()
           : const DashboardScreen(),
+
+      // FAB navigates to Add Application screen
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF1A237E),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddEditScreen()),
+          );
+        },
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+
+      // Bottom navigation bar with Dashboard and Profile tabs
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: _onNavTap,
@@ -32,7 +49,10 @@ class _HomeScreenState extends State<HomeScreen> {
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard_rounded, color: Color(0xFF1A237E)),
+            selectedIcon: Icon(
+              Icons.dashboard_rounded,
+              color: Color(0xFF1A237E),
+            ),
             label: 'Dashboard',
           ),
           NavigationDestination(

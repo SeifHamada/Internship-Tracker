@@ -41,6 +41,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
       _selectedStatus = widget.application!.status;
     }
   }
+
   @override
   void dispose() {
     _companyController.dispose();
