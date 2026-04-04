@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dashboard_screen.dart';
-import 'add_edit_screen.dart';
 
 // Profile screen - displays user info and account preferences
 class ProfileScreen extends StatelessWidget {
@@ -158,41 +156,6 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
-
-      // Bottom navigation bar matching the rest of the app
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.grey[100],
-        shape: const CircularNotchedRectangle(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Navigate to dashboard
-              IconButton(
-                icon: const Icon(Icons.dashboard),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => DashboardScreen()),
-                  );
-                },
-              ),
-              const SizedBox(width: 40),
-              // Navigate to add application screen
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => AddEditScreen()),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -205,7 +168,10 @@ class ProfileScreen extends StatelessWidget {
           color: bg,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 6,
+            ),
           ],
         ),
         child: Column(
