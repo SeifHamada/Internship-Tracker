@@ -269,8 +269,21 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
               borderRadius: BorderRadius.circular(16),
               elevation: 1,
               shadowColor: Colors.black26,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddEditScreen(application: app),
+                    ),
+                  );
+                  if (result == true || mounted) {
+                    _loadApplications();
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -332,6 +345,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
                     ),
                   ],
                 ),
+              ),
               ),
             ),
           );
