@@ -3,8 +3,9 @@ import 'dashboard_screen.dart';
 import 'profile_screen.dart';
 import 'add_edit_screen.dart';
 
-// Navigation shell that manages switching between Dashboard and Profile
-// Also provides a FAB to navigate to the Add Application screen
+// The main layout wrapper for our app.
+// It handles the bottom navigation bar to switch between the Dashboard and your Profile.
+// It also provides a prominent "Add" button so you can quickly log a new application.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -22,12 +23,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Switches between Dashboard and Profile based on selected tab
+      // Show either the user's Profile or the main Dashboard depending on which tab is active
       body: _currentIndex == 1
           ? const ProfileScreen()
           : const DashboardScreen(),
 
-      // FAB navigates to Add Application screen
+      // The floating action button (FAB) that lets you drop in a new application on the go!
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF1A237E),
         onPressed: () {
@@ -40,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-      // Bottom navigation bar with Dashboard and Profile tabs
+      // Our sleek bottom navigation bar to help you move around the app
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: _onNavTap,

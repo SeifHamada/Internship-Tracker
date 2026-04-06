@@ -44,7 +44,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  /// Calculates actual metrics based on fetched applications.
+  // Here we crunch the numbers to show you some quick insights about your internship hunt.
   int get _totalApps => _applications.length;
 
   String get _successRate {
@@ -60,9 +60,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   /// Filter applications that have a deadline in the future, then sort them by date.
   List<Application> get _upcomingDeadlines {
     final now = DateTime.now();
-    final withDeadlines = _applications.where((a) => a.deadlineDate != null).toList();
+    final withDeadlines = _applications
+        .where((a) => a.deadlineDate != null)
+        .toList();
     // Only keeping future deadlines and sorting nearest first
-    withDeadlines.retainWhere((a) => a.deadlineDate!.isAfter(now) || a.deadlineDate!.isAtSameMomentAs(now));
+    withDeadlines.retainWhere(
+      (a) =>
+          a.deadlineDate!.isAfter(now) || a.deadlineDate!.isAtSameMomentAs(now),
+    );
     withDeadlines.sort((a, b) => a.deadlineDate!.compareTo(b.deadlineDate!));
     return withDeadlines.take(5).toList(); // Show top 5
   }
@@ -85,150 +90,169 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: SafeArea(
-        child: _isLoading 
-            ? const Center(child: CircularProgressIndicator()) 
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
             : _error != null
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(_error!, style: const TextStyle(color: Colors.red)),
-                        TextButton(
-                          onPressed: _fetchDashboardData,
-                          child: const Text("Retry"),
-                        )
-                      ],
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(_error!, style: const TextStyle(color: Colors.red)),
+                    TextButton(
+                      onPressed: _fetchDashboardData,
+                      child: const Text("Retry"),
                     ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  ],
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // The friendly greeting right at the top of your screen
+                    const Center(
+                      child: Text(
+                        "InternTrack",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Hello, John Doe!",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // A quick glance at your application numbers: totals, wins, and rejections
+                    Row(
                       children: [
-                        /// Header
-                        const Center(
-                          child: Text(
-                            "InternTrack",
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        Expanded(
+                          child: StatCard(
+                            title: "Total Apps",
+                            value: "$_totalApps",
+                            color: const Color(0xFF4A90E2),
+                            icon: Icons.description,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          "Hello, John Doe!",
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        /// Stats Row
-                        Row(
-                          children: [
-                            Expanded(
-                              child: StatCard(
-                                title: "Total Apps",
-                                value: "$_totalApps",
-                                color: const Color(0xFF4A90E2),
-                                icon: Icons.description,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: StatCard(
-                                title: "Success Rate",
-                                value: _successRate,
-                                color: const Color(0xFF50C878),
-                                icon: Icons.check_circle,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: StatCard(
-                                title: "Rejections",
-                                value: "$_rejectionsCount",
-                                color: const Color(0xFFD32F2F), // Red color for rejections
-                                icon: Icons.cancel,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        /// Section Header with Button
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Upcoming Deadlines",
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ApplicationListScreen(),
-                                  ),
-                                ).then((_) => _fetchDashboardData()); // Refresh on return
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF4A90E2),
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 10,
-                                ),
-                              ),
-                              child: const Text("View Applications"),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        /// Deadlines List
+                        const SizedBox(width: 10),
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
+                          child: StatCard(
+                            title: "Success Rate",
+                            value: _successRate,
+                            color: const Color(0xFF50C878),
+                            icon: Icons.check_circle,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: StatCard(
+                            title: "Rejections",
+                            value: "$_rejectionsCount",
+                            color: const Color(
+                              0xFFD32F2F,
+                            ), // Red color for rejections
+                            icon: Icons.cancel,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Header for your deadlines, plus a handy shortcut to view all your applications
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Upcoming Deadlines",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const ApplicationListScreen(),
+                              ),
+                            ).then(
+                              (_) => _fetchDashboardData(),
+                            ); // Refresh on return
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF4A90E2),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: _upcomingDeadlines.isEmpty
-                                ? const Center(
-                                    child: Text(
-                                      "No upcoming deadlines",
-                                      style: TextStyle(color: Colors.grey, fontSize: 16),
-                                    ),
-                                  )
-                                : ListView.builder(
-                                    itemCount: _upcomingDeadlines.length,
-                                    itemBuilder: (context, index) {
-                                      final app = _upcomingDeadlines[index];
-                                      final diff = app.deadlineDate!.difference(DateTime.now()).inDays;
-                                      
-                                      return DeadlineTile(
-                                        company: app.company,
-                                        role: app.role,
-                                        tag: _getDeadlineTag(diff),
-                                        tagColor: _getDeadlineColor(diff),
-                                      );
-                                    },
-                                  ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
                           ),
+                          child: const Text("View Applications"),
                         ),
                       ],
                     ),
-                  ),
+
+                    const SizedBox(height: 10),
+
+                    // The list where we display your upcoming tasks so nothing slips through the cracks
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: _upcomingDeadlines.isEmpty
+                            ? const Center(
+                                child: Text(
+                                  "No upcoming deadlines",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              )
+                            : ListView.builder(
+                                itemCount: _upcomingDeadlines.length,
+                                itemBuilder: (context, index) {
+                                  final app = _upcomingDeadlines[index];
+                                  final diff = app.deadlineDate!
+                                      .difference(DateTime.now())
+                                      .inDays;
+
+                                  return DeadlineTile(
+                                    company: app.company,
+                                    role: app.role,
+                                    tag: _getDeadlineTag(diff),
+                                    tagColor: _getDeadlineColor(diff),
+                                  );
+                                },
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }
 }
 
-/// 📊 Stat Card
+// 📊 A beautifully simple card used to display key statistics (like 'Total Apps' or 'Success Rate')
 class StatCard extends StatelessWidget {
   final String title;
   final String value;
@@ -276,7 +300,7 @@ class StatCard extends StatelessWidget {
   }
 }
 
-/// 📄 Deadline Tile
+// 📄 A neat little row that displays an upcoming deadline for a specific role and company
 class DeadlineTile extends StatelessWidget {
   final String company;
   final String role;
