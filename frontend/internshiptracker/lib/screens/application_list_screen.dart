@@ -14,19 +14,19 @@ class ApplicationListScreen extends StatefulWidget {
 }
 
 class _ApplicationListScreenState extends State<ApplicationListScreen> {
-  // --- API & form state ---
+  // --- API & state ---
   final ApiService _api = ApiService();
   final TextEditingController _searchController = TextEditingController();
 
-  /// Full list from GET /applications; filtering happens in [_visibleApplications].
   List<Application> _applications = [];
   bool _loading = true;
   String? _error;
   String _searchQuery = '';
-  /// `null` means show all statuses.
+
+  /// null means show all statuses
   String? _statusFilter;
 
-  /// Must stay in sync with [AddEditScreen] so chips match what users can save.
+  /// Must stay in sync with AddEditScreen so chips match what users can save
   static const List<String> _statusOptions = [
     'Applied',
     'Interview',
@@ -47,7 +47,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
     super.dispose();
   }
 
-  /// Fetches all applications from the backend; used on first load, pull-to-refresh, retry, and after returning from add screen.
+  /// Fetches all applications from the backend
   Future<void> _loadApplications() async {
     setState(() {
       _loading = true;
@@ -69,7 +69,49 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
     }
   }
 
-  /// Applies status chip filter, then search text on company and role.
+  /// Shows confirmation dialog then deletes application from backend
+  Future<void> _deleteApplication(Application app) async {
+    // Show confirmation dialog before deleting
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Application'),
+        content: Text(
+          'Are you sure you want to delete the application for ${app.role} at ${app.company}?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await _api.deleteApplication(app.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Application deleted successfully')),
+      );
+      // Reload list after deletion
+      await _loadApplications();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete application')),
+      );
+    }
+  }
+
+  /// Applies status chip filter then search text on company and role
   Iterable<Application> get _visibleApplications {
     var list = _applications;
     if (_statusFilter != null) {
@@ -85,20 +127,28 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
   }
 
   static const List<String> _monthAbbr = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
-  /// Human-readable deadline line (relative for soon dates, else month + day).
+  /// Human-readable deadline line
   String _deadlineCaption(DateTime? deadline) {
     if (deadline == null) return 'No deadline set';
-
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final d = DateTime(deadline.year, deadline.month, deadline.day);
     final diff = d.difference(today).inDays;
     final dateStr = '${_monthAbbr[d.month - 1]} ${d.day}';
-
     if (diff < 0) return 'Past due · $dateStr';
     if (diff == 0) return 'Due today';
     if (diff == 1) return 'Due tomorrow';
@@ -106,7 +156,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
     return 'Due $dateStr';
   }
 
-  /// Background and text colors for status badges and filter chips.
+  /// Background and text colors for status badges and filter chips
   ({Color bg, Color fg}) _statusColors(String status) {
     switch (status) {
       case 'Applied':
@@ -124,7 +174,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
     }
   }
 
-  /// Opens add form; reloads list when user pops back so new entries appear.
+  /// Opens add form and reloads list on return
   Future<void> _openAddScreen() async {
     await Navigator.push<void>(
       context,
@@ -152,7 +202,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Search filters [_visibleApplications] by company / role substring.
+          // Search bar
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: TextField(
@@ -171,7 +221,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
               ),
             ),
           ),
-          // Horizontal status filters; "All" clears [_statusFilter].
+          // Horizontal status filter chips
           SizedBox(
             height: 40,
             child: ListView(
@@ -202,7 +252,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
           Expanded(child: _buildBody()),
         ],
       ),
-      // Navigates to [AddEditScreen] (same pattern as design mock).
+      // FAB to add new application
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddScreen,
         backgroundColor: const Color(0xFF1565C0),
@@ -212,7 +262,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
     );
   }
 
-  /// Loading spinner, error + retry, empty states, or scrollable application cards.
+  /// Builds the main body — loading, error, empty state, or list
   Widget _buildBody() {
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
@@ -253,7 +303,6 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
       );
     }
 
-    // Bottom padding keeps last card above the FAB.
     return RefreshIndicator(
       onRefresh: _loadApplications,
       child: ListView.builder(
@@ -271,6 +320,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
               shadowColor: Colors.black26,
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
+                // Tap card to edit application
                 onTap: () async {
                   final result = await Navigator.push(
                     context,
@@ -284,68 +334,79 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Left: company, role, deadline caption.
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Left: company, role, deadline
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              app.company,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF212121),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              app.role,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF757575),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              _deadlineCaption(app.deadlineDate),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF9E9E9E),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Right: status badge and delete button
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(
-                            app.company,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF212121),
+                          // Status badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colors.bg,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              app.status,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: colors.fg,
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            app.role,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF757575),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            _deadlineCaption(app.deadlineDate),
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF9E9E9E),
+                          const SizedBox(height: 8),
+                          // Delete button
+                          GestureDetector(
+                            onTap: () => _deleteApplication(app),
+                            child: const Icon(
+                              Icons.delete_outline,
+                              color: Color(0xFFC62828),
+                              size: 22,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    // Right: colored status pill.
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colors.bg,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            app.status,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: colors.fg,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
               ),
             ),
           );
@@ -355,7 +416,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
   }
 }
 
-/// Simple tappable pill for the horizontal status filter row.
+/// Simple tappable pill for the horizontal status filter row
 class _FilterChip extends StatelessWidget {
   const _FilterChip({
     required this.label,

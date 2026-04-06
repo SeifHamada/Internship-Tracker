@@ -137,13 +137,13 @@ class ProfileScreen extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                    (route) => false,
-                  );
-                },
+                onPressed: () {},
+                //   Navigator.pushAndRemoveUntil(
+                //     context,
+                //     MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                //     (route) => false,
+                //   );
+                // },
                 icon: const Icon(Icons.logout, color: Colors.white),
                 label: const Text(
                   'Logout',

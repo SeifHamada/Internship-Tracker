@@ -1,3 +1,6 @@
+// to run backend type python -m uvicorn main:app --reload
+// to run flutter run emulator and press f5
+
 import 'package:flutter/material.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
@@ -21,9 +24,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // App opens on Register screen first
-      initialRoute: '/register',
+      //initialRoute: '/register',
+      initialRoute: '/home',
       routes: {
-        '/register': (context) => const RegisterScreen(),
+        //'/register': (context) => const RegisterScreen(),
         '/home': (context) => const HomeScreen(),
         '/add': (context) => const AddEditScreen(),
         '/list': (context) => const ApplicationListScreen(),
