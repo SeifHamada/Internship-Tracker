@@ -4,7 +4,9 @@ import '../services/api_service.dart';
 import 'application_list_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final String userName;
+
+  const DashboardScreen({super.key, required this.userName});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -121,9 +123,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      "Hello, John Doe!",
-                      style: TextStyle(
+                    Text(
+                      "Hello, ${widget.userName}!",
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),

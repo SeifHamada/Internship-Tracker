@@ -1,26 +1,52 @@
 import 'package:flutter/material.dart';
 import 'register_screen.dart';
+import '../services/api_service.dart';
 
-// Profile screen - displays user info and account preferences
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+// Profile screen — displays user info and active application count from backend
+class ProfileScreen extends StatefulWidget {
+  // Name passed in from HomeScreen
+  final String userName;
+
+  const ProfileScreen({super.key, required this.userName});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final ApiService _api = ApiService();
+  int _activeCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadActiveCount();
+  }
+
+  // Fetches all applications and counts them for the Active Logs stat
+  Future<void> _loadActiveCount() async {
+    try {
+      final apps = await _api.getApplications();
+      if (!mounted) return;
+      setState(() => _activeCount = apps.length);
+    } catch (_) {
+      // If backend unreachable just show 0
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
 
-      // App bar with title and gradient bottom border
+      // App bar with gradient bottom border
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
         title: const Text(
           'Profile',
-          style: TextStyle(
-            color: Color(0xFF1A237E),
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(color: Color(0xFF1A237E), fontWeight: FontWeight.w600),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(3),
@@ -45,7 +71,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 16),
 
-            // User avatar with edit icon overlay
+            // User avatar
             Stack(
               children: [
                 Container(
@@ -54,15 +80,9 @@ class ProfileScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black12, blurRadius: 8),
-                    ],
+                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
                   ),
-                  child: const Icon(
-                    Icons.person,
-                    size: 52,
-                    color: Color(0xFF1A237E),
-                  ),
+                  child: const Icon(Icons.person, size: 52, color: Color(0xFF1A237E)),
                 ),
                 Positioned(
                   bottom: 0,
@@ -74,11 +94,7 @@ class ProfileScreen extends StatelessWidget {
                       color: Color(0xFF3949AB),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.edit,
-                      size: 15,
-                      color: Colors.white,
-                    ),
+                    child: const Icon(Icons.edit, size: 15, color: Colors.white),
                   ),
                 ),
               ],
@@ -86,23 +102,23 @@ class ProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // User name and email - static display
-            const Text(
-              'JohnDoe',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            // Display the name passed in from RegisterScreen
+            Text(
+              widget.userName,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             const Text(
-              'johndoe@interntrack.edu',
+              'interntrack user',
               style: TextStyle(color: Colors.grey, fontSize: 13),
             ),
 
             const SizedBox(height: 20),
 
-            // Stats row - active logs and tier
+            // Stats row — Active Logs shows real count from backend
             Row(
               children: [
-                _statCard('ACTIVE LOGS', '24', Colors.white),
+                _statCard('ACTIVE LOGS', '$_activeCount', Colors.white),
                 const SizedBox(width: 12),
                 _statCard('TIER', 'Professional', const Color(0xFFE8EAF6)),
               ],
@@ -110,7 +126,7 @@ class ProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Account preferences section label
+            // Account preferences
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -125,25 +141,24 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            // Preference tiles
             _prefTile(Icons.lock_outline, 'Privacy settings'),
             const SizedBox(height: 1),
             _prefTile(Icons.person_outline, 'Export portfolio'),
 
             const Spacer(),
 
-            // Logout button - no functionality, static only
+            // Logout — clears navigation stack and returns to Register
             SizedBox(
               width: double.infinity,
               height: 50,
               child: ElevatedButton.icon(
-                onPressed: () {},
-                //   Navigator.pushAndRemoveUntil(
-                //     context,
-                //     MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                //     (route) => false,
-                //   );
-                // },
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                    (route) => false,
+                  );
+                },
                 icon: const Icon(Icons.logout, color: Colors.white),
                 label: const Text(
                   'Logout',
@@ -166,7 +181,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Reusable stat card widget
   Widget _statCard(String label, String value, Color bg) {
     return Expanded(
       child: Container(
@@ -208,7 +222,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Reusable preference tile widget
   Widget _prefTile(IconData icon, String label) {
     return Container(
       color: Colors.white,

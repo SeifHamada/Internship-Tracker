@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'screens/register_screen.dart';
-import 'screens/home_screen.dart';
 import 'screens/add_edit_screen.dart';
 import 'screens/application_list_screen.dart';
 
@@ -24,11 +23,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // App opens on Register screen first
-      //initialRoute: '/register',
-      initialRoute: '/home',
+      initialRoute: '/register',
       routes: {
-        //'/register': (context) => const RegisterScreen(),
-        '/home': (context) => const HomeScreen(),
+        '/register': (context) => const RegisterScreen(),
         '/add': (context) => const AddEditScreen(),
         '/list': (context) => const ApplicationListScreen(),
       },
