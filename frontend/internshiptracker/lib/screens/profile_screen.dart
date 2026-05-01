@@ -14,7 +14,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final ApiService _api = ApiService();
+  late final ApiService _api = ApiService(widget.userName);
   int _activeCount = 0;
 
   @override

@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const AddEditScreen()),
+            MaterialPageRoute(builder: (_) => AddEditScreen(userName: widget.userName)),
           );
         },
         child: const Icon(Icons.add, color: Colors.white),

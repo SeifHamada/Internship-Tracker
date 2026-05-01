@@ -6,6 +6,12 @@ import '../models/application.dart';
 
 class ApiService {
   final String baseUrl = 'http://10.0.2.2:8000';
+  final String username;
+
+  ApiService(this.username);
+
+  /// Base URL scoped to this user's applications
+  String get _base => '$baseUrl/users/$username/applications';
 
   // Generic GET helper
   Future<http.Response> _get(String url) async {
@@ -69,7 +75,7 @@ class ApiService {
 
   // GET all
   Future<List<Application>> getApplications() async {
-    final response = await _get('$baseUrl/applications');
+    final response = await _get(_base);
 
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
@@ -81,7 +87,7 @@ class ApiService {
 
   // GET one
   Future<Application> getApplication(int id) async {
-    final response = await _get('$baseUrl/applications/$id');
+    final response = await _get('$_base/$id');
 
     if (response.statusCode == 200) {
       return Application.fromJson(jsonDecode(response.body));
@@ -92,7 +98,7 @@ class ApiService {
 
   // POST
   Future<Application> createApplication(Map<String, dynamic> data) async {
-    final response = await _post('$baseUrl/applications', data);
+    final response = await _post(_base, data);
 
     if (response.statusCode == 201) {
       return Application.fromJson(jsonDecode(response.body));
@@ -106,7 +112,7 @@ class ApiService {
   // PUT
   Future<Application> updateApplication(
       int id, Map<String, dynamic> data) async {
-    final response = await _put('$baseUrl/applications/$id', data);
+    final response = await _put('$_base/$id', data);
 
     if (response.statusCode == 200) {
       return Application.fromJson(jsonDecode(response.body));
@@ -119,7 +125,7 @@ class ApiService {
 
   // DELETE
   Future<bool> deleteApplication(int id) async {
-    final response = await _delete('$baseUrl/applications/$id');
+    final response = await _delete('$_base/$id');
 
     if (response.statusCode == 200) {
       return true;

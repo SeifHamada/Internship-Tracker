@@ -13,7 +13,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final ApiService _api = ApiService();
+  late final ApiService _api = ApiService(widget.userName);
   List<Application> _applications = [];
   bool _isLoading = true;
   String? _error;
@@ -186,7 +186,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const ApplicationListScreen(),
+                                    ApplicationListScreen(userName: widget.userName),
                               ),
                             ).then(
                               (_) => _fetchDashboardData(),

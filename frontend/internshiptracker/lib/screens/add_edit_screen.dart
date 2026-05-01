@@ -4,9 +4,10 @@ import '../services/api_service.dart';
 import '../models/application.dart';
 
 class AddEditScreen extends StatefulWidget {
+  final String userName;
   final Application? application;
 
-  const AddEditScreen({super.key, this.application});
+  const AddEditScreen({super.key, required this.userName, this.application});
 
   @override
   State<AddEditScreen> createState() => _AddEditScreenState();
@@ -119,7 +120,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
     // send to backend
     try {
       if (widget.application == null) {
-        await ApiService().createApplication(data);
+        await ApiService(widget.userName).createApplication(data);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Application saved successfully')),
@@ -133,7 +134,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
           _isLoading = false;
         });
       } else {
-        await ApiService().updateApplication(widget.application!.id, data);
+        await ApiService(widget.userName).updateApplication(widget.application!.id, data);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Application updated successfully')),

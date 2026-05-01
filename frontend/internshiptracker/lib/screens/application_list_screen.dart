@@ -7,7 +7,9 @@ import 'add_edit_screen.dart';
 
 /// Lists internship applications from the backend with search and status filters.
 class ApplicationListScreen extends StatefulWidget {
-  const ApplicationListScreen({super.key});
+  final String userName;
+
+  const ApplicationListScreen({super.key, required this.userName});
 
   @override
   State<ApplicationListScreen> createState() => _ApplicationListScreenState();
@@ -15,7 +17,7 @@ class ApplicationListScreen extends StatefulWidget {
 
 class _ApplicationListScreenState extends State<ApplicationListScreen> {
   // --- API & state ---
-  final ApiService _api = ApiService();
+  late final ApiService _api = ApiService(widget.userName);
   final TextEditingController _searchController = TextEditingController();
 
   List<Application> _applications = [];
@@ -178,7 +180,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
   Future<void> _openAddScreen() async {
     await Navigator.push<void>(
       context,
-      MaterialPageRoute<void>(builder: (_) => const AddEditScreen()),
+      MaterialPageRoute<void>(builder: (_) => AddEditScreen(userName: widget.userName)),
     );
     if (mounted) await _loadApplications();
   }
@@ -325,7 +327,7 @@ class _ApplicationListScreenState extends State<ApplicationListScreen> {
                   final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AddEditScreen(application: app),
+                      builder: (context) => AddEditScreen(userName: widget.userName, application: app),
                     ),
                   );
                   if (result == true && mounted) {

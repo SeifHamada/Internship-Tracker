@@ -1,13 +1,10 @@
 # Main FastAPI application for the Internship Tracker backend
-# Sets up the web server, database, routing, and CORS middleware
+# Sets up the web server, routing, and CORS middleware
+# Each user gets their own database file, created automatically on first login.
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import router
-from database import Base, engine
-
-# Create database tables if they don't exist
-Base.metadata.create_all(bind=engine)
 
 # Create the main FastAPI application instance
 app = FastAPI()
